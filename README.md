@@ -16,9 +16,11 @@ Install the driver as below:
 git clone https://github.com/temnok/hs300-maas
 cd hs300-maas
 DRIVER_DIR="/usr/lib/python3/dist-packages/provisioningserver/drivers/power"
-sudo patch -d ${DRIVER_DIR} -p5 < hs300-maas.diff
+sudo patch -d ${DRIVER_DIR} -p5 < hs300.patch
 sudo service maas-regiond restart && sudo service maas-rackd restart
 ```
 
 Alternatively, you can simply copy `hs300-maas.py` file to `/usr/lib/python3/dist-packages/provisioningserver/drivers/power`
 directory and add `HS300PowerDriver` to `drivers/power/registry.py` file manually.
+
+![Screenshot](README.png)
