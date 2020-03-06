@@ -27,6 +27,7 @@ __all__ = []
 import array
 import json
 import socket
+import time
 from provisioningserver.drivers import (
     make_ip_extractor,
     make_setting_field,
@@ -94,11 +95,13 @@ class HS300(object):
         return self.device_id + str(id).zfill(2)
 
     def _send_udp(self, request):
+        time.sleep(0.5)
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.settimeout(1)
         request = self._encode(json.dumps(request))
         s.sendto(request, (self.ip, 9999))
         response, addr = s.recvfrom(1024)
+        time.sleep(0.5)
         return json.loads(self._decode(response))
 
     @staticmethod
@@ -124,7 +127,7 @@ class HS300PowerDriver(PowerDriver):
     description = "HS300"
     settings = [
         make_setting_field('power_address', "IP address", required=True),
-        make_setting_field('outlet_id', "Outlet ID", scope=SETTING_SCOPE.NODE, required=True),
+        make_setting_field('outlet_id', "Outlet ID, 1-6", scope=SETTING_SCOPE.NODE, required=True),
         make_setting_field('min_power', "Min ON power, W (optional)", scope=SETTING_SCOPE.NODE, required=False),
     ]
     ip_extractor = make_ip_extractor('power_address')
@@ -143,12 +146,12 @@ class HS300PowerDriver(PowerDriver):
 
     def _set_outlet_state(self, state, power_address=None, outlet_id=None, **extra):
         client = HS300(power_address)
-        client.set_relay_state(outlet_id, state)
+        client.set_relay_state(int(outlet_id) - 1, state)
 
     def _query_outlet_state(self, power_address=None, outlet_id=None, min_power=None, **extra):
         client = HS300(power_address)
         if min_power is not None:
             min_power = float(min_power)
-        if client.get_relay_state(outlet_id, min_power) == 0:
+        if client.get_relay_state(int(outlet_id) - 1, min_power) == 0:
             return "off"
         return "on"
