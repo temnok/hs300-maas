@@ -123,7 +123,7 @@ class HS300(object):
 
 class HS300PowerDriver(PowerDriver):
     name = 'hs300'
-    chassis = False
+    chassis = True
     description = "HS300"
     settings = [
         make_setting_field('power_address', "IP address", required=True),
